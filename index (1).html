@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSMGalaxy AI Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .chat-container {
+            width: 90%;
+            max-width: 400px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .profile-header .logo {
+            font-size: 50px;
+            margin-right: 10px;
+        }
+
+        .profile-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .chat-message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f1f1f1;
+        }
+
+        .chat-message.user {
+            background-color: #ddf1ff;
+            text-align: right;
+        }
+
+        .chat-message.bot {
+            background-color: #d0f0c0;
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 18%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .help-button {
+            background-color: #2196F3;
+            width: 100%;
+            margin-top: 10px;
+            text-align: center;
+            padding: 12px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .help-button:hover {
+            background-color: #1976D2;
+        }
+
+        .help-message {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .help-message ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .help-message ul li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Profile Header with Logo -->
+        <div class="profile-header">
+            <span class="logo">🤖</span> <!-- Bot logo as emoji -->
+            <h3>GSMGalaxy AI</h3>
+        </div>
+
+        <div class="chat-box" id="chat-box"></div>
+        <input type="text" id="user-input" placeholder="Ask me anything..." onkeydown="sendMessage(event)">
+        <button onclick="sendMessage()">Send</button>
+        <button class="help-button" onclick="showHelp()">Help</button>
+        <div class="help-message" id="help-message">
+            <h4>GSMGalaxy AI - Basic Commands</h4>
+            <ul>
+                <li><b>Hello / Hi / Wassup:</b> Greet the bot and get a response.</li>
+                <li><b>Payment Method:</b> Get payment details for adding funds.</li>
+                <li><b>Report a Problem:</b> Get contact details for reporting issues.</li>
+                <li><b>Website URL:</b> Get the website URL for signing up or logging in.</li>
+                <li><b>Website Proofs / Feedbacks:</b> View website proofs and feedbacks.</li>
+            </ul>
+            <p>Tap "Help" to see all available commands. Feel free to ask anything!</p>
+        </div>
+    </div>
+
+    <script>
+        // Load chat history from local storage on page load
+        window.onload = function() {
+            const chatHistory = JSON.parse(localStorage.getItem("chatHistory")) || [];
+            const chatBox = document.getElementById("chat-box");
+            
+            chatHistory.forEach(message => {
+                const messageDiv = document.createElement("div");
+                messageDiv.classList.add("chat-message", message.sender);
+                messageDiv.innerHTML = message.text;
+                chatBox.appendChild(messageDiv);
+            });
+
+            // Scroll to the bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
+        };
+
+        function sendMessage(event) {
+            if (event && event.key !== 'Enter' && event.type !== 'click') return;
+
+            const userInput = document.getElementById("user-input");
+            const chatBox = document.getElementById("chat-box");
+
+            if (userInput.value.trim() === "") return;
+
+            // Add the user's message to the chat
+            const userMessage = document.createElement("div");
+            userMessage.classList.add("chat-message", "user");
+            userMessage.innerText = userInput.value;
+            chatBox.appendChild(userMessage);
+
+            // Generate bot response
+            const botResponse = document.createElement("div");
+            botResponse.classList.add("chat-message", "bot");
+            botResponse.innerHTML = generateBotResponse(userInput.value);
+            chatBox.appendChild(botResponse);
+
+            // Scroll to the bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Save chat to local storage
+            saveChat(userInput.value, botResponse.innerHTML);
+
+            // Clear the input field
+            userInput.value = "";
+        }
+
+        function generateBotResponse(input) {
+            const lowerCaseInput = input.toLowerCase();
+            if (lowerCaseInput.includes("hello") || lowerCaseInput.includes("hi") || lowerCaseInput.includes("wassup")) {
+                return "Hello! This is GSMGalaxy AI bot. I'm here to help you with basic tasks! Please tap 'Help' to see all commands.";
+            } else if (lowerCaseInput.includes("payment method")) {
+                return "🌟 For Add Funds 🌟\n\n🔹 Gcash\n📞 Number: 0928 906 8254\n💬 Please send a screenshot\n\n🔹 PayPal\n✉️ Email: ayezcka@gmail.com\n💻 Use this email to transfer funds\n\n🔹 Cebuana Lhuillier\n🏦 Account Number: 0011 0921 0639\n📸 Kindly send a screenshot.";
+            } else if (lowerCaseInput.includes("report a problem")) {
+                return "Please contact one of our support channels to address your issues:\n\nTelegram @ginoopa";
+            } else if (lowerCaseInput.includes("website url")) {
+                return 'This is the website URL. Sign up or log in now: <a href="https://gsmmgalaxy.site/" target="_blank">https://gsmmgalaxy.site/</a>';
+            } else if (lowerCaseInput.includes("website proofs") || lowerCaseInput.includes("proofs") || lowerCaseInput.includes("feedbacks")) {
+                return 'Here\'s the proof and feedback: <a href="https://www.facebook.com/61554271941347/posts/pfbid0AvTsFdbZF6X5ZtdWSk3iHEFYGQPmqtQAxfiyutVQN9Xd6wdmGNzmBBbYvAdrStLSl/?app=fbl" target="_blank">Feedback on Facebook</a>';
+            } else {
+                return "I'm here to assist you! Please share more details about your question.";
+            }
+        }
+
+        function saveChat(userMessage, botMessage) {
+            const chatHistory = JSON.parse(localStorage.getItem("chatHistory")) || [];
+
+            // Save user and bot messages to chat history
+            chatHistory.push({ sender: "user", text: userMessage });
+            chatHistory.push({ sender: "bot", text: botMessage });
+
+            // Store updated chat history in local storage
+            localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+        }
+
+        function showHelp() {
+            const helpMessage = document.getElementById("help-message");
+            helpMessage.style.display = (helpMessage.style.display === "block") ? "none" : "block";
+        }
+    </script>
+</body>
+</html>
